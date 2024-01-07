@@ -21,7 +21,7 @@ export async function fetchRevenue() {
     // Don't do this in production :)
 
     // console.log('Fetching revenue data...');
-    await sleep(3_000);
+    // await sleep(3_000);
 
     const data = await sql<Revenue>`SELECT * FROM revenue`;
 
