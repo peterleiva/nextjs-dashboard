@@ -18,23 +18,17 @@ const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
 export async function createInvoice(formData: FormData) {
-  const rawFormData = CreateInvoice.parse({
+  const { customerId, amount, status } = CreateInvoice.parse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
 
-  const amountInCents = rawFormData.amount * 100;
+  const amountInCents = amount * 100;
   const date = DateTime.now().toISODate();
 
   await sql`
-    INSERT INTO invoices VALUES(
-        ${rawFormData.customerId},
-        ${amountInCents},
-        ${rawFormData.status},
-        ${date}
-        )
-    )
+    INSERT INTO invoices (customer_id, amount, status, date) VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
   `;
 
   revalidatePath('/dashboard/invoices');
@@ -58,4 +52,9 @@ export async function updateInvoice(id: string, formData: FormData) {
 
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
+}
+
+export async function deleteInvoice(id: string) {
+  await sql`DELETE FROM invoices WHERE id = ${id}`;
+  revalidatePath('/dashboard/invoices');
 }
